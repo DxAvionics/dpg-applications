@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tenant Information Form | Davidson Properties Group</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a2744;
+    --navy-mid: #243460;
+    --gold: #c9a84c;
+    --cream: #faf8f3;
+    --gray-light: #f2f0eb;
+    --gray-mid: #dedad2;
+    --gray-dark: #6b6860;
+    --red: #c0392b;
+    --green: #27ae60;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Password Gate ── */
+  #gate {
+    position: fixed; inset: 0;
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000; padding: 1.5rem;
+  }
+  .gate-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 2.5rem 2rem;
+    width: 100%; max-width: 380px;
+    text-align: center;
+    border-top: 4px solid var(--gold);
+  }
+  .gate-card .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: var(--navy);
+    font-weight: 600; margin-bottom: 0.3rem;
+  }
+  .gate-card .lock { font-size: 2rem; margin-bottom: 1rem; }
+  .gate-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem; color: var(--navy);
+    margin-bottom: 0.4rem;
+  }
+  .gate-card p { font-size: 0.8rem; color: var(--gray-dark); font-family: 'DM Sans', sans-serif; margin-bottom: 1.5rem; }
+  .gate-input {
+    width: 100%; padding: 0.8rem 1rem;
+    border: 1.5px solid var(--gray-mid);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem; text-align: center;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.75rem;
+    outline: none;
+  }
+  .gate-input:focus { border-color: var(--navy); }
+  .gate-btn {
+    width: 100%; padding: 0.85rem;
+    background: var(--navy); color: #fff;
+    border: none; border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .gate-btn:hover { background: var(--navy-mid); }
+  .gate-error { color: var(--red); font-size: 0.78rem; font-family: 'DM Sans', sans-serif; margin-top: 0.6rem; display: none; }
+
+  /* ── Page ── */
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: #1a1a1a;
+    min-height: 100vh;
+  }
+  .page { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+  /* ── Header ── */
+  .header {
+    background: var(--navy);
+    border-radius: 8px 8px 0 0;
+    border-bottom: 4px solid var(--gold);
+    padding: 1.8rem 2rem;
+    text-align: center;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--gold); color: var(--navy);
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.25rem 0.8rem; border-radius: 20px;
+    margin-bottom: 0.7rem;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; color: #fff; margin-bottom: 0.25rem;
+  }
+  .header p { font-size: 0.75rem; color: rgba(255,255,255,0.55); }
+
+  /* ── Form body ── */
+  .form-body {
+    background: #fff;
+    border: 1px solid var(--gray-mid);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 0;
+  }
+
+  /* ── Section ── */
+  .section { padding: 1.5rem 2rem; border-bottom: 1px solid var(--gray-light); }
+  .section:last-of-type { border-bottom: none; }
+  .section-header {
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1.2rem;
+  }
+  .section-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--navy); color: #fff;
+    font-size: 0.75rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem; color: var(--navy); font-weight: 600;
+  }
+
+  /* ── Fields ── */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+  .grid.thirds { grid-template-columns: 1fr 1fr 1fr; }
+  .grid.full { grid-template-columns: 1fr; }
+  @media (max-width: 520px) { .grid, .grid.thirds { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 0.3rem; }
+  .field label {
+    font-size: 0.7rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--gold);
+  }
+  .field input, .field select, .field textarea {
+    border: 1.5px solid var(--gray-mid);
+    border-radius: 5px; padding: 0.6rem 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; color: #1a1a1a;
+    background: var(--gray-light);
+    outline: none; transition: border-color 0.15s;
+    width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--navy); background: #fff;
+  }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .field .ferr { color: var(--red); font-size: 0.7rem; display: none; }
+
+  .divider { border: none; border-top: 1px dashed var(--gray-mid); margin: 1rem 0; }
+  .sub-label {
+    font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--gray-dark);
+    margin-bottom: 0.7rem; margin-top: 0.25rem;
+  }
+
+  /* ── Radio ── */
+  .radio-row { display: flex; gap: 1.5rem; flex-wrap: wrap; margin-top: 0.1rem; }
+  .radio-row label {
+    display: flex; align-items: center; gap: 0.4rem;
+    font-size: 0.85rem; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    color: #1a1a1a; font-weight: 400;
+    text-transform: none; letter-spacing: 0;
+  }
+  .radio-row input[type="radio"] { accent-color: var(--navy); width: 15px; height: 15px; }
+
+  /* ── Pet block ── */
+  #petBlock { display: none; margin-top: 0.9rem; }
+
+  /* ── Submit ── */
+  .submit-section { padding: 1.5rem 2rem; }
+  .submit-btn {
+    display: block; width: 100%;
+    background: var(--gold); color: var(--navy);
+    border: none; border-radius: 6px;
+    padding: 1rem; font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .submit-btn:hover { background: #d4b05a; }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .success-screen {
+    display: none; text-align: center;
+    padding: 3rem 2rem; background: #fff;
+    border: 1px solid var(--gray-mid);
+    border-top: none; border-radius: 0 0 8px 8px;
+  }
+  .success-screen .check { font-size: 3rem; margin-bottom: 1rem; }
+  .success-screen h2 { font-family: 'Playfair Display', serif; color: var(--navy); margin-bottom: 0.5rem; }
+  .success-screen p { color: var(--gray-dark); font-size: 0.85rem; line-height: 1.6; }
+
+  .footer {
+    text-align: center; margin-top: 1.5rem;
+    font-size: 0.68rem; color: var(--gray-dark); line-height: 1.6;
+  }
+  .secure-note {
+    background: rgba(26,39,68,0.04);
+    border: 1px solid var(--gray-mid);
+    border-radius: 6px; padding: 0.75rem 1rem;
+    margin: 0 2rem 1rem;
+    font-size: 0.75rem; color: var(--gray-dark);
+    display: flex; align-items: flex-start; gap: 0.5rem;
+  }
+  .secure-note span { font-size: 1rem; }
+</style>
+</head>
+<body>
+
+<!-- ── PASSWORD GATE ── -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="logo">Davidson Properties Group, LLC</div>
+    <div class="lock">🔒</div>
+    <h2>Secure Tenant Form</h2>
+    <p>This form contains confidential information. Enter the password provided by your property manager to continue.</p>
+    <input class="gate-input" type="password" id="gateInput" placeholder="Enter password" autocomplete="off">
+    <button class="gate-btn" onclick="checkPassword()">Access Form</button>
+    <div class="gate-error" id="gateError">Incorrect password. Please contact (208) 268-8838.</div>
+  </div>
+</div>
+
+<div class="page">
+  <div class="header">
+    <div class="badge">Confidential</div>
+    <h1>Tenant Information Form</h1>
+    <p>Davidson Properties Group, LLC &nbsp;&middot;&nbsp; 495 S 3rd East, Mountain Home, ID 83647</p>
+  </div>
+
+  <div class="secure-note">
+    <span>🔐</span>
+    <span>This form is password-protected and encrypted in transit. Your information is used solely for tenancy screening and is not shared with third parties.</span>
+  </div>
+
+  <form id="tenantForm" novalidate>
+    <input type="hidden" name="_subject" value="DPG Supplemental Tenant Info Submission">
+    <input type="hidden" name="_next" value="https://square.link/u/kHQoWnBa">
+    <div class="form-body">
+
+      <!-- ── 1. Personal Info ── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">1</div>
+          <div class="section-title">Personal Information</div>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label>First Name</label>
+            <input type="text" name="first_name" placeholder="Legal first name">
+          </div>
+          <div class="field">
+            <label>Last Name</label>
+            <input type="text" name="last_name" placeholder="Legal last name">
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input type="tel" name="phone" placeholder="(555) 000-0000">
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="you@email.com">
+          </div>
+          <div class="field">
+            <label>Date of Birth</label>
+            <input type="text" name="dob" placeholder="MM/DD/YYYY">
+          </div>
+          <div class="field">
+            <label>Unit Applying For</label>
+            <select name="unit">
+              <option value="">— Select —</option>
+              <option>Unit A — 2 Bed / 1.5 Bath</option>
+              <option>Unit B — 3 Bed / 1 Bath</option>
+              <option>Unit C — Lofted Studio</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 2. Current Landlord Reference ── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <div class="section-title">Current Landlord Reference</div>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label>Landlord / Property Manager Name</label>
+            <input type="text" name="curr_landlord_name" placeholder="Full name">
+          </div>
+          <div class="field">
+            <label>Landlord Phone</label>
+            <input type="tel" name="curr_landlord_phone" placeholder="(555) 000-0000">
+          </div>
+          <div class="field">
+            <label>Landlord Email (if available)</label>
+            <input type="email" name="curr_landlord_email" placeholder="landlord@email.com">
+          </div>
+          <div class="field">
+            <label>Current Monthly Rent</label>
+            <input type="text" name="curr_rent" placeholder="$0.00">
+          </div>
+          <div class="field grid full">
+            <label>Current Address</label>
+            <input type="text" name="curr_address" placeholder="Street, City, State, ZIP">
+          </div>
+          <div class="field">
+            <label>Move-In Date</label>
+            <input type="text" name="curr_move_in" placeholder="MM/YYYY">
+          </div>
+          <div class="field">
+            <label>Reason for Leaving</label>
+            <input type="text" name="curr_reason" placeholder="Brief reason">
+          </div>
+        </div>
+
+        <hr class="divider">
+        <div class="sub-label">Previous Address (if less than 3 years at current)</div>
+        <div class="grid">
+          <div class="field">
+            <label>Previous Landlord Name</label>
+            <input type="text" name="prev_landlord_name" placeholder="Full name">
+          </div>
+          <div class="field">
+            <label>Previous Landlord Phone</label>
+            <input type="tel" name="prev_landlord_phone" placeholder="(555) 000-0000">
+          </div>
+          <div class="field grid full">
+            <label>Previous Address</label>
+            <input type="text" name="prev_address" placeholder="Street, City, State, ZIP">
+          </div>
+          <div class="field">
+            <label>Dates of Tenancy</label>
+            <input type="text" name="prev_dates" placeholder="MM/YYYY — MM/YYYY">
+          </div>
+          <div class="field">
+            <label>Monthly Rent</label>
+            <input type="text" name="prev_rent" placeholder="$0.00">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 3. Employment ── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">3</div>
+          <div class="section-title">Employment & Income</div>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label>Employer / Income Source</label>
+            <input type="text" name="employer" placeholder="Company name">
+          </div>
+          <div class="field">
+            <label>Job Title / Occupation</label>
+            <input type="text" name="occupation" placeholder="Your role">
+          </div>
+          <div class="field">
+            <label>Employer Phone</label>
+            <input type="tel" name="emp_phone" placeholder="(555) 000-0000">
+          </div>
+          <div class="field">
+            <label>Supervisor Name</label>
+            <input type="text" name="supervisor" placeholder="Direct supervisor">
+          </div>
+          <div class="field">
+            <label>Employment Start Date</label>
+            <input type="text" name="emp_start" placeholder="MM/YYYY">
+          </div>
+          <div class="field">
+            <label>Gross Monthly Income</label>
+            <input type="text" name="gross_income" placeholder="$0.00">
+          </div>
+          <div class="field">
+            <label>Employment Type</label>
+            <select name="emp_type">
+              <option value="">— Select —</option>
+              <option>Full-Time W-2</option>
+              <option>Part-Time W-2</option>
+              <option>Self-Employed / 1099</option>
+              <option>Military / Active Duty</option>
+              <option>Military / Veteran</option>
+              <option>Retired</option>
+              <option>Social Security / Disability</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Additional Monthly Income (if any)</label>
+            <input type="text" name="add_income" placeholder="Source and amount">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 4. Personal References ── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">4</div>
+          <div class="section-title">Personal References</div>
+        </div>
+        <div class="sub-label">Reference 1</div>
+        <div class="grid">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" name="ref1_name" placeholder="Full name">
+          </div>
+          <div class="field">
+            <label>Relationship</label>
+            <input type="text" name="ref1_rel" placeholder="Friend, colleague, etc.">
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input type="tel" name="ref1_phone" placeholder="(555) 000-0000">
+          </div>
+          <div class="field">
+            <label>How Long Known</label>
+            <input type="text" name="ref1_known" placeholder="e.g. 5 years">
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="sub-label">Reference 2</div>
+        <div class="grid">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" name="ref2_name" placeholder="Full name">
+          </div>
+          <div class="field">
+            <label>Relationship</label>
+            <input type="text" name="ref2_rel" placeholder="Friend, colleague, etc.">
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input type="tel" name="ref2_phone" placeholder="(555) 000-0000">
+          </div>
+          <div class="field">
+            <label>How Long Known</label>
+            <input type="text" name="ref2_known" placeholder="e.g. 3 years">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 5. Vehicles ── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">5</div>
+          <div class="section-title">Vehicles</div>
+        </div>
+        <div class="sub-label">Vehicle 1</div>
+        <div class="grid thirds">
+          <div class="field">
+            <label>Year / Make / Model</label>
+            <input type="text" name="v1_info" placeholder="e.g. 2019 Toyota Camry">
+          </div>
+          <div class="field">
+            <label>Color</label>
+            <input type="text" name="v1_color" placeholder="Color">
+          </div>
+          <div class="field">
+            <label>License Plate + State</label>
+            <input type="text" name="v1_plate" placeholder="e.g. 1ABC234 CA">
+          </div>
+        </div>
+        <hr class="divider">
+        <div class="sub-label">Vehicle 2 (if applicable)</div>
+        <div class="grid thirds">
+          <div class="field">
+            <label>Year / Make / Model</label>
+            <input type="text" name="v2_info" placeholder="e.g. 2021 Ford F-150">
+          </div>
+          <div class="field">
+            <label>Color</label>
+            <input type="text" name="v2_color" placeholder="Color">
+          </div>
+          <div class="field">
+            <label>License Plate + State</label>
+            <input type="text" name="v2_plate" placeholder="e.g. 2DEF456 ID">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 6. Pets ── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">6</div>
+          <div class="section-title">Pets</div>
+        </div>
+        <div class="field">
+          <label>Do you have a pet?</label>
+          <div class="radio-row">
+            <label><input type="radio" name="has_pet" value="No" checked> No</label>
+            <label><input type="radio" name="has_pet" value="Yes"> Yes</label>
+          </div>
+        </div>
+        <div id="petBlock">
+          <hr class="divider">
+          <div class="grid">
+            <div class="field">
+              <label>Pet Name</label>
+              <input type="text" name="pet_name" placeholder="Name">
+            </div>
+            <div class="field">
+              <label>Breed</label>
+              <input type="text" name="pet_breed" placeholder="Breed">
+            </div>
+            <div class="field">
+              <label>Approximate Weight</label>
+              <input type="text" name="pet_weight" placeholder="e.g. 45 lbs">
+            </div>
+            <div class="field">
+              <label>Age</label>
+              <input type="text" name="pet_age" placeholder="e.g. 3 years">
+            </div>
+            <div class="field">
+              <label>Currently Vaccinated?</label>
+              <div class="radio-row">
+                <label><input type="radio" name="pet_vaccinated" value="Yes"> Yes</label>
+                <label><input type="radio" name="pet_vaccinated" value="No"> No</label>
+              </div>
+            </div>
+            <div class="field">
+              <label>ESA or Service Animal?</label>
+              <div class="radio-row">
+                <label><input type="radio" name="pet_esa" value="No"> No</label>
+                <label><input type="radio" name="pet_esa" value="ESA"> ESA</label>
+                <label><input type="radio" name="pet_esa" value="Service Animal"> Service Animal</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 7. Emergency Contact ── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">7</div>
+          <div class="section-title">Emergency Contact</div>
+        </div>
+        <div class="grid">
+          <div class="field">
+            <label>Full Name</label>
+            <input type="text" name="emerg_name" placeholder="Full legal name">
+          </div>
+          <div class="field">
+            <label>Relationship</label>
+            <input type="text" name="emerg_rel" placeholder="e.g. Mother, Brother">
+          </div>
+          <div class="field">
+            <label>Phone</label>
+            <input type="tel" name="emerg_phone" placeholder="(555) 000-0000">
+          </div>
+          <div class="field">
+            <label>Email (if available)</label>
+            <input type="email" name="emerg_email" placeholder="contact@email.com">
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 8. Additional Notes ── -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-num">8</div>
+          <div class="section-title">Anything Else?</div>
+        </div>
+        <div class="field">
+          <label>Additional Information</label>
+          <textarea name="notes" placeholder="Anything you'd like us to know — prior evictions, special circumstances, context on your application, etc."></textarea>
+        </div>
+      </div>
+
+    </div><!-- /form-body -->
+
+    <div class="submit-section">
+      <button type="submit" class="submit-btn">Submit Securely →</button>
+    </div>
+
+    <div id="successScreen" class="success-screen">
+      <div class="check">✅</div>
+      <h2>Information Received</h2>
+      <p>Thank you. Davidson Properties Group has received your supplemental information.<br><br>
+      We will follow up within 1–2 business days. Questions? Call or text <strong>(208) 268-8838</strong>.</p>
+    </div>
+
+  </form>
+
+  <div class="footer">
+    Davidson Properties Group, LLC &nbsp;&middot;&nbsp; (208) 268-8838 &nbsp;&middot;&nbsp; DavidsonProperties@pm.me<br>
+    Service-Disabled Veteran-Owned Small Business &nbsp;&middot;&nbsp; Equal Housing Provider &nbsp;&middot;&nbsp; Elmore County, Idaho<br>
+    This form is encrypted in transit. Information is used solely for tenancy screening purposes.
+  </div>
+</div>
+
+<script>
+  // ── PASSWORD CONFIG ──────────────────────────────────────────
+  // Change this to whatever password you want to give the tenant
+  var FORM_PASSWORD = 'DPG2026!';
+
+  // ── Gate ────────────────────────────────────────────────────
+  function checkPassword() {
+    var input = document.getElementById('gateInput').value;
+    if (input === FORM_PASSWORD) {
+      document.getElementById('gate').style.display = 'none';
+    } else {
+      document.getElementById('gateError').style.display = 'block';
+      document.getElementById('gateInput').style.borderColor = '#c0392b';
+      document.getElementById('gateInput').value = '';
+    }
+  }
+
+  document.getElementById('gateInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') checkPassword();
+  });
+
+  // ── Pet toggle ───────────────────────────────────────────────
+  document.querySelectorAll('[name="has_pet"]').forEach(function(r) {
+    r.addEventListener('change', function() {
+      document.getElementById('petBlock').style.display = this.value === 'Yes' ? 'block' : 'none';
+    });
+  });
+
+  // ── Submit ───────────────────────────────────────────────────
+  var form = document.getElementById('tenantForm');
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Minimal validation
+    var required = ['first_name','last_name','phone','email'];
+    var firstErr = null;
+    required.forEach(function(n) {
+      var el = form.querySelector('[name="' + n + '"]');
+      if (el && !el.value.trim()) {
+        el.style.borderColor = '#c0392b';
+        if (!firstErr) firstErr = el;
+        el.addEventListener('input', function() { el.style.borderColor = ''; }, {once:true});
+      }
+    });
+    if (firstErr) { firstErr.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+
+    var btn = form.querySelector('.submit-btn');
+    btn.textContent = 'Submitting…'; btn.disabled = true;
+
+    fetch('https://formspree.io/f/xeedpnja', {
+      method: 'POST',
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(function(res) {
+      form.querySelector('.form-body').style.display = 'none';
+      form.querySelector('.submit-section').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+    })
+    .catch(function() {
+      form.querySelector('.form-body').style.display = 'none';
+      form.querySelector('.submit-section').style.display = 'none';
+      document.getElementById('successScreen').style.display = 'block';
+    });
+  });
+</script>
+
+</body>
+</html>
